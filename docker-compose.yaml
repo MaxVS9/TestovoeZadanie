@@ -17,43 +17,23 @@ services:
 
   mysql:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
+    container_name: db-master
+    volumes:
+      - ./env/master.cnf:/etc/my.cnf.d/repl.cnf
+      - ./env/master.sql:/docker-entrypoint-initdb.d/start.sql
     environment:
-      MYSQL_DATABASE: READER_DB
-      MYSQL_ROOT_PASSWORD: 123
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: "123"
 
-
-  phpmyadmin:
-    # Use phpmyadmin/phpmyadmin:5.0.2 image
-    image: phpmyadmin:latest
-    # Connect to "my-network" network, as defined below
-
-    # Map port 8080 on the host to port 80 inside the container
-    # Syntax is: "HOST_PORT:CONTAINER_PORT"
-    ports:
-      - "80:8080"
-    # Pass a list of environment variables to the container
-    environment:
-      PMA_HOST: mysql
-    # Wait for "mysql" container to start first
+  mysqlread:
+    image: mysql:8.0
+    container_name: db-slave1
+    volumes:
+      - ./env/slave1.cnf:/etc/my.cnf.d/repl.cnf
+      - ./env/slave.sql:/docker-entrypoint-initdb.d/start.sql
     depends_on:
       - mysql
-
-
-
-  mysql2:
-    image: mysql:8.0
-    ports:
-      - "6446:6446"
     environment:
-      MYSQL_DATABASE: WRITER_DB
-      MYSQL_ROOT_PASSWORD: 123
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 123
-
+      MYSQL_ROOT_PASSWORD: "123"
 
   composer:
     build:
